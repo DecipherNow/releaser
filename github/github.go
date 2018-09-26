@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/deciphernow/releaser/utils"
@@ -56,7 +57,7 @@ func PrepareGithubRelease(client gh_client.Client, symver, organization, asset s
 		organization,
 		repository,
 		*releaseResp.ID,
-		&github.UploadOptions{Name: asset},
+		&github.UploadOptions{Name: path.Base(asset)},
 		file,
 	)
 	if err != nil {

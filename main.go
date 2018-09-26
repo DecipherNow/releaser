@@ -8,6 +8,7 @@ import (
 
 	"github.com/deciphernow/releaser/docker"
 	"github.com/deciphernow/releaser/github"
+	"github.com/deciphernow/releaser/utils"
 	gh_client "github.com/google/go-github/github"
 	"github.com/urfave/cli"
 	"golang.org/x/oauth2"
@@ -21,7 +22,7 @@ func main() {
 	// Declare flags common to commands, and pass them in Flags below.
 	verFlag := cli.StringFlag{
 		Name:  "symver",
-		Value: "x.x.x",
+		Value: "",
 		Usage: "Symantic Version of the release to prepare",
 	}
 
@@ -79,6 +80,11 @@ func main() {
 			Usage: "Do the docker job",
 			Flags: []cli.Flag{verFlag, dockerImage, dockerUserFlag, dockerPasswordFlag},
 			Action: func(clictx *cli.Context) error {
+				if utils.IsDevCommit(clictx.String("symver")) {
+					fmt.Println("Dev tag found; exiting")
+					return nil
+				}
+
 				images, err := docker.PrepareDocker(clictx.String("dockerImage"), clictx.String("symver"))
 				if err != nil {
 					fmt.Println(images)
@@ -97,6 +103,10 @@ func main() {
 			Usage: "Do the github release",
 			Flags: []cli.Flag{verFlag, githubTokenFlag, githubOrgFlag, githubUserFlag, githubPasswordFlag, assetFlag},
 			Action: func(clictx *cli.Context) error {
+				if utils.IsDevCommit(clictx.String("symver")) {
+					fmt.Println("Dev tag found; exiting")
+					return nil
+				}
 
 				client := gh_client.NewClient(&http.Client{})
 				if clictx.String("githubToken") != "" {

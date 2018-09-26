@@ -7,6 +7,10 @@ import (
 	"strings"
 )
 
+func IsDevCommit(version string) bool {
+	return strings.HasSuffix(version, "dev")
+}
+
 // ParseSymver is a really quick parser for symantic versionin
 func ParseSymver(version string) (major, minor, patch string, err error) {
 	if strings.HasPrefix(version, "v") {
