@@ -1,44 +1,61 @@
 # Releaser
-Implement the decipher release process.
+Implement the decipher release process.  The two sub-commands available here are `github` and `docker`, to help with two main release processes.
 
+### Github
+The github functionality is a simple wrapper around a github SDK to create
+releases, tag commits, and upload release assets.  
+
+### Docker
+The docker functionality is a simple wrapper around a docker SDK to take a
+source image, tag it with major, major.minor, and major.minor.patch tags, and then to push up to dockerhub.
 
 ## Usage
 ### Help
+Help packes are available for both the Docker and Github processes:
+
+#### Docker Image Tag/Push
 ```bash
+>>$ ./releaser help docker
 NAME:
-   Releaser - Facilitate the release process of artifacts
+   releaser docker - Do the docker job
 
 USAGE:
-   releaser [global options] command [command options] [arguments...]
+   releaser docker [command options] [arguments...]
 
-VERSION:
-   0.1.0
-
-COMMANDS:
-     docker   Do the docker job
-     github   Do the github release
-     help, h  Shows a list of commands or help for one command
-
-GLOBAL OPTIONS:
-   --symver value          Symantic Version of the release to prepare
-   --dockerImage value     Source Docker image to release
-   --dockerUser value      Username for docker push/pulls
-   --dockerPassword value  Password for docker push/pulls
-   --githubToken value     Access token for github releases
-   --githubUser value      Username for github releases
-   --githubPassword value  Password for github releases
-   --asset value           File[s] to be uploaded to the github release
-   --help, -h              show help
-   --version, -v           print the version
+OPTIONS:
+   --symver value    Symantic Version of the release to prepare
+   --image value     Source Docker image to release
+   --username value  Username for cmd operations
+   --password value  Password for cmd operations
+   --suffix value    String to be appended to the final docker tag. e.g. -alpine, -centos
 
 ```
 
+#### Github Release
+
+```bash
+justin@mal:~/go/src/github.com/deciphernow/releaser$ ./releaser help github
+NAME:
+   releaser github - Do the github release
+
+USAGE:
+   releaser github [command options] [arguments...]
+
+OPTIONS:
+   --symver value        Symantic Version of the release to prepare
+   --token value         Access token for github releases
+   --organization value  Organization for github releases
+   --username value      Username for cmd operations
+   --password value      Password for cmd operations
+   --asset value         File[s] to be uploaded to the github release
+```
+
 ### Symver tagging/push docker images
-`./releaser docker --symver $VERSION --dockerImage deciphernow/gm-proxy --dockerUser $DOCKER_USER --dockerPassword $DOCKER_PASS`
+`releaser docker --symver v1.3.4 --image deciphernow/gm-proxy:latest --username $DOCKER_USER --password $DOCKER_PASS`
 
 ### Create release and upload an asset for the release
-``./releaser github --symver $VERSION --githubToken $GITHUB_TOKEN --githubOrg deciphernow --asset ./binary-asset`
+`releaser github --symver 3.4.5 --token $GITHUB_TOKEN --organization deciphernow --asset ./binary-asset`
 
 ## Build
-- `dep ensure -v`
-- `go build`
+1. `dep ensure -v`
+2. `go build`

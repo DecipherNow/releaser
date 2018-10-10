@@ -14,13 +14,33 @@ import (
 
 //
 
+// UploadReleaseAsset
+func uploadReleaseAsset(client gh_client.Client, releaseID int64, organization, repository, filename string) error {
+	fmt.Printf("Uploading %s to %s/%s at release ID %d\n", filename, organization, repository, releaseID)
+	file, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+	_, _, err = client.Repositories.UploadReleaseAsset(
+		context.Background(),
+		organization,
+		repository,
+		releaseID,
+		&github.UploadOptions{Name: path.Base(filename)},
+		file,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // PrepareGithubRelease does stuff
 func PrepareGithubRelease(client gh_client.Client, symver, organization, asset string) (string, error) {
-	fmt.Println("github release process")
 	repository, err := utils.ParseRepoName()
 
 	gitHash, err := utils.ParseGitHash()
-	fmt.Println(gitHash)
 
 	major, minor, patch, err := utils.ParseSymver(symver)
 	if err != nil {
@@ -28,16 +48,14 @@ func PrepareGithubRelease(client gh_client.Client, symver, organization, asset s
 	}
 
 	name := fmt.Sprintf("Release %s", strings.Join([]string{major, minor, patch}, "."))
-	fmt.Sprintf("Creating release %s", name)
+	fmt.Printf("Creating release %s\n", name)
 	release := github.RepositoryRelease{
 		TagName:         &symver,
 		TargetCommitish: &gitHash,
 		Name:            &name,
 	}
 
-	fmt.Println(release)
-
-	releaseResp, resp, err := client.Repositories.CreateRelease(
+	releaseResp, _, err := client.Repositories.CreateRelease(
 		context.Background(),
 		organization,
 		repository,
@@ -46,26 +64,13 @@ func PrepareGithubRelease(client gh_client.Client, symver, organization, asset s
 	if err != nil {
 		fmt.Printf("Error found in github release creation: %s", err)
 	}
-	fmt.Println(resp)
 
 	if asset != "" {
-		file, err := os.Open(asset)
-		if err != nil {
-			return "Failed to open asset file", err
+		allAssets := strings.Split(asset, ",")
+
+		for _, filename := range allAssets {
+			uploadReleaseAsset(client, *releaseResp.ID, organization, repository, filename)
 		}
-		respAsset, response, err := client.Repositories.UploadReleaseAsset(
-			context.Background(),
-			organization,
-			repository,
-			*releaseResp.ID,
-			&github.UploadOptions{Name: path.Base(asset)},
-			file,
-		)
-		if err != nil {
-			return "Failed to upload release asset", err
-		}
-		fmt.Println(respAsset)
-		fmt.Println(response)
 	}
 
 	return "", nil

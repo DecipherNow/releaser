@@ -18,7 +18,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "Releaser"
 	app.Usage = "Facilitate the release process of artifacts"
-	app.Version = "0.1.0"
+	app.Version = "0.2.0"
 
 	// Declare flags common to commands, and pass them in Flags below.
 	verFlag := cli.StringFlag{
@@ -28,43 +28,37 @@ func main() {
 	}
 
 	dockerImage := cli.StringFlag{
-		Name:  "dockerImage",
+		Name:  "image",
 		Value: "",
 		Usage: "Source Docker image to release",
 	}
 
-	dockerUserFlag := cli.StringFlag{
-		Name:  "dockerUser",
+	dockerSuffix := cli.StringFlag{
+		Name:  "suffix",
 		Value: "",
-		Usage: "Username for docker push/pulls",
+		Usage: "String to be appended to the final docker tag. e.g. -alpine, -centos",
 	}
 
-	dockerPasswordFlag := cli.StringFlag{
-		Name:  "dockerPassword",
+	usernameFlag := cli.StringFlag{
+		Name:  "username",
 		Value: "",
-		Usage: "Password for docker push/pulls",
+		Usage: "Username for cmd operations",
+	}
+
+	passwordFlag := cli.StringFlag{
+		Name:  "password",
+		Value: "",
+		Usage: "Password for cmd operations",
 	}
 
 	githubTokenFlag := cli.StringFlag{
-		Name:  "githubToken",
+		Name:  "token",
 		Value: "",
 		Usage: "Access token for github releases",
 	}
 
-	githubUserFlag := cli.StringFlag{
-		Name:  "githubUser",
-		Value: "",
-		Usage: "Username for github releases",
-	}
-
-	githubPasswordFlag := cli.StringFlag{
-		Name:  "githubPassword",
-		Value: "",
-		Usage: "Password for github releases",
-	}
-
 	githubOrgFlag := cli.StringFlag{
-		Name:  "githubOrg",
+		Name:  "organization",
 		Value: "",
 		Usage: "Organization for github releases",
 	}
@@ -79,21 +73,21 @@ func main() {
 		{
 			Name:  "docker",
 			Usage: "Do the docker job",
-			Flags: []cli.Flag{verFlag, dockerImage, dockerUserFlag, dockerPasswordFlag},
+			Flags: []cli.Flag{verFlag, dockerImage, usernameFlag, passwordFlag, dockerSuffix},
 			Action: func(clictx *cli.Context) error {
 				if utils.IsDevCommit(clictx.String("symver")) {
 					fmt.Println("Dev tag found; exiting")
 					return nil
 				}
 
-				images, err := docker.PrepareDocker(clictx.String("dockerImage"), clictx.String("symver"))
+				images, err := docker.PrepareDocker(clictx.String("image"), clictx.String("symver"), clictx.String("suffix"))
 				if err != nil {
 					fmt.Println(images)
 					fmt.Println(err)
 				}
 
 				for _, imageName := range images {
-					docker.PushImage(imageName, clictx.String("dockerUser"), clictx.String("dockerPassword"))
+					docker.PushImage(imageName, clictx.String("username"), clictx.String("password"))
 				}
 
 				return nil
@@ -102,7 +96,7 @@ func main() {
 		{
 			Name:  "github",
 			Usage: "Do the github release",
-			Flags: []cli.Flag{verFlag, githubTokenFlag, githubOrgFlag, githubUserFlag, githubPasswordFlag, assetFlag},
+			Flags: []cli.Flag{verFlag, githubTokenFlag, githubOrgFlag, usernameFlag, passwordFlag, assetFlag},
 			Action: func(clictx *cli.Context) error {
 				if utils.IsDevCommit(clictx.String("symver")) {
 					fmt.Println("Dev tag found; exiting")
@@ -121,8 +115,8 @@ func main() {
 				} else {
 					fmt.Println("Using Username/Password auth")
 					auth := gh_client.BasicAuthTransport{
-						Username: clictx.String("githubUser"),
-						Password: clictx.String("githubPassword"),
+						Username: clictx.String("username"),
+						Password: clictx.String("password"),
 					}
 					client = gh_client.NewClient(&http.Client{Transport: &auth})
 				}
@@ -130,7 +124,7 @@ func main() {
 				msg, err := github.PrepareGithubRelease(
 					*client,
 					clictx.String("symver"),
-					clictx.String("githubOrg"),
+					clictx.String("organization"),
 					clictx.String("asset"),
 				)
 
@@ -149,11 +143,9 @@ func main() {
 	app.Flags = []cli.Flag{
 		verFlag,
 		dockerImage,
-		dockerUserFlag,
-		dockerPasswordFlag,
+		usernameFlag,
+		passwordFlag,
 		githubTokenFlag,
-		githubUserFlag,
-		githubPasswordFlag,
 		assetFlag,
 	}
 

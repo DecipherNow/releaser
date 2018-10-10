@@ -16,15 +16,18 @@ import (
 )
 
 // PrepareDocker sets up the image for the release
-func PrepareDocker(source string, symver string) ([]string, error) {
+func PrepareDocker(source string, symver string, suffix string) ([]string, error) {
+	source = strings.Split(source, ":")[0]
+
 	major, minor, patch, err := utils.ParseSymver(symver)
 	if err != nil {
 		return []string{}, err
 	}
 
-	allTags := []string{major,
-		strings.Join([]string{major, minor}, "."),
-		strings.Join([]string{major, minor, patch}, "."),
+	allTags := []string{
+		strings.Join([]string{major, suffix}, ""),
+		strings.Join([]string{strings.Join([]string{major, minor}, "."), suffix}, ""),
+		strings.Join([]string{strings.Join([]string{major, minor, patch}, "."), suffix}, ""),
 	}
 
 	madeImages := []string{}
