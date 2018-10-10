@@ -44,27 +44,29 @@ func PrepareGithubRelease(client gh_client.Client, symver, organization, asset s
 		&release,
 	)
 	if err != nil {
-		fmt.Sprintf("Error found in github release creation: %s", err)
+		fmt.Printf("Error found in github release creation: %s", err)
 	}
 	fmt.Println(resp)
 
-	file, err := os.Open(asset)
-	if err != nil {
-		return "Failed to open asset file", err
+	if asset != "" {
+		file, err := os.Open(asset)
+		if err != nil {
+			return "Failed to open asset file", err
+		}
+		respAsset, response, err := client.Repositories.UploadReleaseAsset(
+			context.Background(),
+			organization,
+			repository,
+			*releaseResp.ID,
+			&github.UploadOptions{Name: path.Base(asset)},
+			file,
+		)
+		if err != nil {
+			return "Failed to upload release asset", err
+		}
+		fmt.Println(respAsset)
+		fmt.Println(response)
 	}
-	respAsset, response, err := client.Repositories.UploadReleaseAsset(
-		context.Background(),
-		organization,
-		repository,
-		*releaseResp.ID,
-		&github.UploadOptions{Name: path.Base(asset)},
-		file,
-	)
-	if err != nil {
-		return "Failed to upload release asset", err
-	}
-	fmt.Println(respAsset)
-	fmt.Println(response)
 
 	return "", nil
 }

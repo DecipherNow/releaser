@@ -18,6 +18,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "Releaser"
 	app.Usage = "Facilitate the release process of artifacts"
+	app.Version = "0.1.0"
 
 	// Declare flags common to commands, and pass them in Flags below.
 	verFlag := cli.StringFlag{
