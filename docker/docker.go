@@ -33,7 +33,7 @@ import (
 
 // PrepareDocker tags the source image as the final release images.
 func PrepareDocker(source string, symver string, suffix string) ([]string, error) {
-	source = strings.Split(source, ":")[0]
+	source_base := strings.Split(source, ":")[0]
 
 	major, minor, patch, err := utils.ParseSymver(symver)
 	if err != nil {
@@ -48,7 +48,7 @@ func PrepareDocker(source string, symver string, suffix string) ([]string, error
 
 	madeImages := []string{}
 	for _, tag := range allTags {
-		destination := strings.Join([]string{source, tag}, ":")
+		destination := strings.Join([]string{source_base, tag}, ":")
 		_, err := tagImage(source, destination)
 		if err != nil {
 			fmt.Printf("Error tagging image as %s\n", destination)

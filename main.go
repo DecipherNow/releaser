@@ -18,7 +18,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "Releaser"
 	app.Usage = "Facilitate the release process of artifacts"
-	app.Version = "0.2.0"
+	app.Version = "0.2.1"
 
 	// Declare flags common to commands, and pass them in Flags below.
 	verFlag := cli.StringFlag{
@@ -104,7 +104,7 @@ func main() {
 				}
 
 				client := gh_client.NewClient(&http.Client{})
-				if clictx.String("githubToken") != "" {
+				if clictx.String("token") != "" {
 					fmt.Println("Using token auth")
 					ctx := context.Background()
 					ts := oauth2.StaticTokenSource(
