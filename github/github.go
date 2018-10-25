@@ -1,3 +1,19 @@
+// Copyright 2017 Decipher Technology Studios LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// Package github provides high-level utilities for interacting with github
+// for the purposes of performing releases and uploading assets.
 package github
 
 import (
@@ -12,9 +28,7 @@ import (
 	gh_client "github.com/google/go-github/github"
 )
 
-//
-
-// UploadReleaseAsset
+// UploadReleaseAsset takes a file and uploads it to a specific github release.
 func uploadReleaseAsset(client gh_client.Client, releaseID int64, organization, repository, filename string) error {
 	fmt.Printf("Uploading %s to %s/%s at release ID %d\n", filename, organization, repository, releaseID)
 	file, err := os.Open(filename)
@@ -36,7 +50,7 @@ func uploadReleaseAsset(client gh_client.Client, releaseID int64, organization, 
 	return nil
 }
 
-// PrepareGithubRelease does stuff
+// PrepareGithubRelease performs the entire github release process.
 func PrepareGithubRelease(client gh_client.Client, symver, organization, asset string) (string, error) {
 	repository, err := utils.ParseRepoName()
 

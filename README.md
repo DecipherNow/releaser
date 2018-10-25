@@ -1,4 +1,7 @@
 # Releaser
+[![GoDoc](https://godoc.org/github.com/DecipherNow/releaser?status.svg)](https://godoc.org/github.com/DecipherNow/releaser)
+[![Go Report Card](https://goreportcard.com/badge/github.com/DecipherNow/releaser)](https://goreportcard.com/report/github.com/DecipherNow/releaser)
+
 Implement the decipher release process.  The two sub-commands available here are `github` and `docker`, to help with two main release processes.
 
 ### Github
