@@ -18,13 +18,13 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "Releaser"
 	app.Usage = "Facilitate the release process of artifacts"
-	app.Version = "0.2.1"
+	app.Version = "0.2.2"
 
 	// Declare flags common to commands, and pass them in Flags below.
 	verFlag := cli.StringFlag{
-		Name:  "symver",
+		Name:  "semver",
 		Value: "",
-		Usage: "Symantic Version of the release to prepare",
+		Usage: "Semantic Version of the release to prepare",
 	}
 
 	dockerImage := cli.StringFlag{
@@ -75,12 +75,12 @@ func main() {
 			Usage: "Do the docker job",
 			Flags: []cli.Flag{verFlag, dockerImage, usernameFlag, passwordFlag, dockerSuffix},
 			Action: func(clictx *cli.Context) error {
-				if utils.IsDevCommit(clictx.String("symver")) {
+				if utils.IsDevCommit(clictx.String("semver")) {
 					fmt.Println("Dev tag found; exiting")
 					return nil
 				}
 
-				images, err := docker.PrepareDocker(clictx.String("image"), clictx.String("symver"), clictx.String("suffix"))
+				images, err := docker.PrepareDocker(clictx.String("image"), clictx.String("semver"), clictx.String("suffix"))
 				if err != nil {
 					fmt.Println(images)
 					fmt.Println(err)
@@ -98,7 +98,7 @@ func main() {
 			Usage: "Do the github release",
 			Flags: []cli.Flag{verFlag, githubTokenFlag, githubOrgFlag, usernameFlag, passwordFlag, assetFlag},
 			Action: func(clictx *cli.Context) error {
-				if utils.IsDevCommit(clictx.String("symver")) {
+				if utils.IsDevCommit(clictx.String("semver")) {
 					fmt.Println("Dev tag found; exiting")
 					return nil
 				}
@@ -123,7 +123,7 @@ func main() {
 
 				msg, err := github.PrepareGithubRelease(
 					*client,
-					clictx.String("symver"),
+					clictx.String("semver"),
 					clictx.String("organization"),
 					clictx.String("asset"),
 				)
