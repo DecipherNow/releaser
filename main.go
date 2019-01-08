@@ -108,7 +108,7 @@ func main() {
 					fmt.Println("Using token auth")
 					ctx := context.Background()
 					ts := oauth2.StaticTokenSource(
-						&oauth2.Token{AccessToken: clictx.String("githubToken")},
+						&oauth2.Token{AccessToken: clictx.String("token")},
 					)
 					tc := oauth2.NewClient(ctx, ts)
 					client = gh_client.NewClient(tc)
