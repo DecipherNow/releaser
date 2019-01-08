@@ -26,7 +26,7 @@ USAGE:
    releaser docker [command options] [arguments...]
 
 OPTIONS:
-   --symver value    Symantic Version of the release to prepare
+   --semver value    Symantic Version of the release to prepare
    --image value     Source Docker image to release
    --username value  Username for cmd operations
    --password value  Password for cmd operations
@@ -45,7 +45,7 @@ USAGE:
    releaser github [command options] [arguments...]
 
 OPTIONS:
-   --symver value        Symantic Version of the release to prepare
+   --semver value        Symantic Version of the release to prepare
    --token value         Access token for github releases
    --organization value  Organization for github releases
    --username value      Username for cmd operations
@@ -53,11 +53,11 @@ OPTIONS:
    --asset value         File[s] to be uploaded to the github release
 ```
 
-### Symver tagging/push docker images
-`releaser docker --symver v1.3.4 --image deciphernow/gm-proxy:latest --username $DOCKER_USER --password $DOCKER_PASS`
+### semver tagging/push docker images
+`releaser docker --semver v1.3.4 --image deciphernow/gm-proxy:latest --username $DOCKER_USER --password $DOCKER_PASS`
 
 ### Create release and upload an asset for the release
-`releaser github --symver 3.4.5 --token $GITHUB_TOKEN --organization deciphernow --asset ./binary-asset`
+`releaser github --semver 3.4.5 --token $GITHUB_TOKEN --organization deciphernow --asset ./binary-asset`
 
 ## Build
 1. `dep ensure -v`

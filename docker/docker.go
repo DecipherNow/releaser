@@ -32,10 +32,10 @@ import (
 )
 
 // PrepareDocker tags the source image as the final release images.
-func PrepareDocker(source string, symver string, suffix string) ([]string, error) {
+func PrepareDocker(source string, semver string, suffix string) ([]string, error) {
 	source_base := strings.Split(source, ":")[0]
 
-	major, minor, patch, err := utils.ParseSymver(symver)
+	major, minor, patch, err := utils.Parsesemver(semver)
 	if err != nil {
 		return []string{}, err
 	}

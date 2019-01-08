@@ -51,12 +51,12 @@ func uploadReleaseAsset(client gh_client.Client, releaseID int64, organization, 
 }
 
 // PrepareGithubRelease performs the entire github release process.
-func PrepareGithubRelease(client gh_client.Client, symver, organization, asset string) (string, error) {
+func PrepareGithubRelease(client gh_client.Client, semver, organization, asset string) (string, error) {
 	repository, err := utils.ParseRepoName()
 
 	gitHash, err := utils.ParseGitHash()
 
-	major, minor, patch, err := utils.ParseSymver(symver)
+	major, minor, patch, err := utils.Parsesemver(semver)
 	if err != nil {
 		return "", err
 	}
@@ -64,7 +64,7 @@ func PrepareGithubRelease(client gh_client.Client, symver, organization, asset s
 	name := fmt.Sprintf("Release %s", strings.Join([]string{major, minor, patch}, "."))
 	fmt.Printf("Creating release %s\n", name)
 	release := github.RepositoryRelease{
-		TagName:         &symver,
+		TagName:         &semver,
 		TargetCommitish: &gitHash,
 		Name:            &name,
 	}
