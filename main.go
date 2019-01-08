@@ -63,6 +63,12 @@ func main() {
 		Usage: "Organization for github releases",
 	}
 
+	releaseIDFlag := cli.StringFlag{
+		Name:  "releaseID",
+		Value: "",
+		Usage: "Release to upload assets to.  Must already exist.",
+	}
+
 	assetFlag := cli.StringFlag{
 		Name:  "asset",
 		Value: "",
@@ -108,7 +114,7 @@ func main() {
 					fmt.Println("Using token auth")
 					ctx := context.Background()
 					ts := oauth2.StaticTokenSource(
-						&oauth2.Token{AccessToken: clictx.String("githubToken")},
+						&oauth2.Token{AccessToken: clictx.String("token")},
 					)
 					tc := oauth2.NewClient(ctx, ts)
 					client = gh_client.NewClient(tc)
@@ -131,6 +137,47 @@ func main() {
 				if err != nil {
 					fmt.Println("Error in github stuff", err)
 					fmt.Println(msg)
+				}
+
+				return nil
+			},
+		},
+		{
+			Name:  "add-asset",
+			Usage: "Add an asset to an existing github release",
+			Flags: []cli.Flag{githubTokenFlag, githubOrgFlag, usernameFlag, passwordFlag, assetFlag, releaseIDFlag},
+			Action: func(clictx *cli.Context) error {
+
+				client := gh_client.NewClient(&http.Client{})
+				if clictx.String("token") != "" {
+					fmt.Println("Using token auth")
+					ctx := context.Background()
+					ts := oauth2.StaticTokenSource(
+						&oauth2.Token{AccessToken: clictx.String("githubToken")},
+					)
+					tc := oauth2.NewClient(ctx, ts)
+					client = gh_client.NewClient(tc)
+				} else {
+					fmt.Println("Using Username/Password auth")
+					auth := gh_client.BasicAuthTransport{
+						Username: clictx.String("username"),
+						Password: clictx.String("password"),
+					}
+					client = gh_client.NewClient(&http.Client{Transport: &auth})
+				}
+
+				repository, err := utils.ParseRepoName()
+
+				err = github.UploadReleaseAsset(
+					*client,
+					clictx.Int64("releaseID"),
+					clictx.String("organization"),
+					repository,
+					clictx.String("asset"),
+				)
+
+				if err != nil {
+					fmt.Println("Error uploading release asset:", err)
 				}
 
 				return nil
