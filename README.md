@@ -37,7 +37,7 @@ OPTIONS:
 #### Github Release
 
 ```bash
-justin@mal:~/go/src/github.com/deciphernow/releaser$ ./releaser help github
+>>$ ./releaser help github
 NAME:
    releaser github - Do the github release
 
@@ -51,6 +51,24 @@ OPTIONS:
    --username value      Username for cmd operations
    --password value      Password for cmd operations
    --asset value         File[s] to be uploaded to the github release
+```
+
+##### Adding release asset
+```bash
+>>$ ./releaser help add-asset
+NAME:
+   releaser add-asset - Add an asset to an existing github release
+
+USAGE:
+   releaser add-asset [command options] [arguments...]
+
+OPTIONS:
+   --token value         Access token for github releases
+   --organization value  Organization for github releases
+   --username value      Username for cmd operations
+   --password value      Password for cmd operations
+   --asset value         File[s] to be uploaded to the github release
+   --releaseID value     Release to upload assets to.  Must already exist.
 ```
 
 ### semver tagging/push docker images

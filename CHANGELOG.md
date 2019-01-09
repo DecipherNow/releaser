@@ -1,3 +1,11 @@
+## 0.3.0 (Jan 8th, 2018)
+### Added
+- Option to add release assets to existing release ID
+
+### Fixed
+- Bug in parsing github token
+
+
 ## 0.2.1 (October 16th, 2018)
 ### Fixed
 - Bug in splitting source docker tag off before re-tagging
