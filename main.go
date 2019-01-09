@@ -18,7 +18,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "Releaser"
 	app.Usage = "Facilitate the release process of artifacts"
-	app.Version = "0.2.2"
+	app.Version = "0.3.0"
 
 	// Declare flags common to commands, and pass them in Flags below.
 	verFlag := cli.StringFlag{
@@ -61,6 +61,12 @@ func main() {
 		Name:  "organization",
 		Value: "",
 		Usage: "Organization for github releases",
+	}
+
+	releaseIDFlag := cli.StringFlag{
+		Name:  "releaseID",
+		Value: "",
+		Usage: "Release to upload assets to.  Must already exist.",
 	}
 
 	assetFlag := cli.StringFlag{
@@ -131,6 +137,48 @@ func main() {
 				if err != nil {
 					fmt.Println("Error in github stuff", err)
 					fmt.Println(msg)
+				}
+
+				return nil
+			},
+		},
+		{
+			Name:  "add-asset",
+			Usage: "Add an asset to an existing github release",
+			Flags: []cli.Flag{githubTokenFlag, githubOrgFlag, usernameFlag, passwordFlag, assetFlag, releaseIDFlag},
+			Action: func(clictx *cli.Context) error {
+
+				client := gh_client.NewClient(&http.Client{})
+				if clictx.String("token") != "" {
+					fmt.Println("Using token auth")
+					ctx := context.Background()
+					ts := oauth2.StaticTokenSource(
+						&oauth2.Token{AccessToken: clictx.String("token")},
+					)
+					tc := oauth2.NewClient(ctx, ts)
+					client = gh_client.NewClient(tc)
+				} else {
+					fmt.Println("Using Username/Password auth")
+					auth := gh_client.BasicAuthTransport{
+						Username: clictx.String("username"),
+						Password: clictx.String("password"),
+					}
+					client = gh_client.NewClient(&http.Client{Transport: &auth})
+				}
+
+				repository, err := utils.ParseRepoName()
+				fmt.Println("Uploading asset to:", repository)
+				fmt.Println("Uploading asset to release:", clictx.Int64("releaseID"))
+				err = github.UploadReleaseAsset(
+					*client,
+					clictx.Int64("releaseID"),
+					clictx.String("organization"),
+					repository,
+					clictx.String("asset"),
+				)
+
+				if err != nil {
+					fmt.Println("Error uploading release asset:", err)
 				}
 
 				return nil

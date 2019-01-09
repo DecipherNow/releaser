@@ -29,7 +29,7 @@ import (
 )
 
 // UploadReleaseAsset takes a file and uploads it to a specific github release.
-func uploadReleaseAsset(client gh_client.Client, releaseID int64, organization, repository, filename string) error {
+func UploadReleaseAsset(client gh_client.Client, releaseID int64, organization, repository, filename string) error {
 	fmt.Printf("Uploading %s to %s/%s at release ID %d\n", filename, organization, repository, releaseID)
 	file, err := os.Open(filename)
 	if err != nil {
@@ -83,7 +83,7 @@ func PrepareGithubRelease(client gh_client.Client, semver, organization, asset s
 		allAssets := strings.Split(asset, ",")
 
 		for _, filename := range allAssets {
-			uploadReleaseAsset(client, *releaseResp.ID, organization, repository, filename)
+			UploadReleaseAsset(client, *releaseResp.ID, organization, repository, filename)
 		}
 	}
 
