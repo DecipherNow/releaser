@@ -1,3 +1,7 @@
+## 0.3.1 (Jan 8th, 2018)
+### Fixed
+- Build binary without CGO to run on alpine
+
 ## 0.3.0 (Jan 8th, 2018)
 ### Added
 - Option to add release assets to existing release ID
