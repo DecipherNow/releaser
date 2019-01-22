@@ -18,7 +18,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "Releaser"
 	app.Usage = "Facilitate the release process of artifacts"
-	app.Version = "0.3.0"
+	app.Version = "0.3.2"
 
 	// Declare flags common to commands, and pass them in Flags below.
 	verFlag := cli.StringFlag{
@@ -88,8 +88,9 @@ func main() {
 
 				images, err := docker.PrepareDocker(clictx.String("image"), clictx.String("semver"), clictx.String("suffix"))
 				if err != nil {
-					fmt.Println(images)
-					fmt.Println(err)
+					fmt.Println("Create images", images)
+					fmt.Println("Error found:", err)
+					os.Exit(1)
 				}
 
 				for _, imageName := range images {

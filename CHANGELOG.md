@@ -1,3 +1,7 @@
+## 0.3.2 (Jan 8th, 2018)
+### Added
+- Push to normalized Docker registry names
+
 ## 0.3.1 (Jan 8th, 2018)
 ### Fixed
 - Build binary without CGO to run on alpine

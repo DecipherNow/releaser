@@ -27,6 +27,7 @@ import (
 	"strings"
 
 	"github.com/deciphernow/releaser/utils"
+	"github.com/docker/distribution/reference"
 	"github.com/docker/docker/api/types"
 	dc "github.com/docker/docker/client"
 )
@@ -49,12 +50,21 @@ func PrepareDocker(source string, semver string, suffix string) ([]string, error
 	madeImages := []string{}
 	for _, tag := range allTags {
 		destination := strings.Join([]string{source_base, tag}, ":")
-		_, err := tagImage(source, destination)
+
+		normDest, err := reference.ParseNormalizedNamed(destination)
+		if err != nil {
+			fmt.Println(err)
+			return madeImages, err
+		}
+
+		destination = strings.Join([]string{(normDest).Name(), tag}, ":")
+		fmt.Println("tagging to normalized name", destination)
+		_, err = tagImage(source, destination)
 		if err != nil {
 			fmt.Printf("Error tagging image as %s\n", destination)
-		} else {
-			madeImages = append(madeImages, destination)
+			return madeImages, err
 		}
+		madeImages = append(madeImages, destination)
 	}
 
 	return madeImages, nil
@@ -98,7 +108,7 @@ func tagImage(source string, destination string) (string, error) {
 
 	err = dockerCli.ImageTag(context.Background(), source, destination)
 	if err != nil {
-		return fmt.Sprintf("Error tagging image as %s\n", destination), err
+		return fmt.Sprintf("Error tagging %s as %s\n", source, destination), err
 	}
 
 	return "", nil
