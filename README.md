@@ -8,6 +8,8 @@ Implement the decipher release process.  The two sub-commands available here are
 The github functionality is a simple wrapper around a github SDK to create
 releases, tag commits, and upload release assets.  
 
+> Note: the github sub-command relies on the current working directory for repository information. Ensure that the final folder in the path where releaser is running matches the remote repository name. For example, for a remote repository of `releaser` the current working directory should be of the form `.../.../releaser`.
+
 ### Docker
 The docker functionality is a simple wrapper around a docker SDK to take a
 source image, tag it with major, major.minor, and major.minor.patch tags, and then to push up to dockerhub.
