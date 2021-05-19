@@ -39,7 +39,7 @@ func PrepareDocker(source string, semver string, suffix string) ([]string, error
 	allTags := make([]string, 0, 3)
 
 	if strings.Contains(semver, "-rc.") {
-		allTags = append(allTags, semver)
+		allTags = append(allTags, semver+suffix)
 	} else {
 		major, minor, patch := utils.Parsesemver(semver)
 		allTags = append(allTags,
@@ -63,7 +63,7 @@ func PrepareDocker(source string, semver string, suffix string) ([]string, error
 		fmt.Println("tagging to normalized name", destination)
 		_, err = tagImage(source, destination)
 		if err != nil {
-			fmt.Printf("Error tagging image as %s\n", destination)
+			fmt.Printf("Error tagging image as %s: %s\n", destination, err.Error())
 			return madeImages, err
 		}
 		madeImages = append(madeImages, destination)
@@ -74,7 +74,7 @@ func PrepareDocker(source string, semver string, suffix string) ([]string, error
 
 // PushImage pushes docker images to a docker registry
 func PushImage(source string, user string, password string) error {
-	dockerCli, err := dc.NewClientWithOpts()
+	dockerCli, err := dc.NewClientWithOpts(dc.FromEnv)
 	if err != nil {
 		return err
 	}
@@ -106,7 +106,7 @@ func PushImage(source string, user string, password string) error {
 }
 
 func tagImage(source string, destination string) (string, error) {
-	dockerCli, err := dc.NewClientWithOpts()
+	dockerCli, err := dc.NewClientWithOpts(dc.FromEnv)
 	if err != nil {
 		return "Could not establish docker client", err
 	}

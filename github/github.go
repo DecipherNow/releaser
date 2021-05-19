@@ -79,6 +79,7 @@ func PrepareGithubRelease(client *gh_client.Client, tag, organization, asset str
 	)
 	if err != nil {
 		fmt.Printf("Error found in github release creation: %s", err)
+		return "", err
 	}
 
 	if asset != "" {
