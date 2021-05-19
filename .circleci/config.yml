@@ -3,18 +3,17 @@ version: 2
 defaults: &defaults
   working_directory: /go/src/github.com/deciphernow/releaser
   docker:
-    - image: golang:1.10
+    - image: golang:1.16
 
 jobs:
   build:
     <<: *defaults
     steps:
       - checkout
-      - run: apt-get update && apt-get install -y ca-certificates git 
-      - run: go get -u github.com/golang/dep/cmd/dep
-      - run: dep ensure -v
+      - run: apt-get update && apt-get install -y ca-certificates git
+      - run: GOSUMDB=off GOPROXY=direct GO111MODULE=on go mod vendor
       - run: CGO_ENABLED=0 go build
-      - run: 
+      - run:
           name: Release
           command: | 
             export $(cat VERSION | grep VERSION)
