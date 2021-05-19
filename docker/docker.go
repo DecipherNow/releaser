@@ -36,18 +36,20 @@ import (
 func PrepareDocker(source string, semver string, suffix string) ([]string, error) {
 	source_base := strings.Split(source, ":")[0]
 
-	major, minor, patch, err := utils.Parsesemver(semver)
-	if err != nil {
-		return []string{}, err
+	allTags := make([]string, 0, 3)
+
+	if strings.Contains(semver, "-rc.") {
+		allTags = append(allTags, semver)
+	} else {
+		major, minor, patch := utils.Parsesemver(semver)
+		allTags = append(allTags,
+			strings.Join([]string{major, suffix}, ""),
+			strings.Join([]string{strings.Join([]string{major, minor}, "."), suffix}, ""),
+			strings.Join([]string{strings.Join([]string{major, minor, patch}, "."), suffix}, ""),
+		)
 	}
 
-	allTags := []string{
-		strings.Join([]string{major, suffix}, ""),
-		strings.Join([]string{strings.Join([]string{major, minor}, "."), suffix}, ""),
-		strings.Join([]string{strings.Join([]string{major, minor, patch}, "."), suffix}, ""),
-	}
-
-	madeImages := []string{}
+	var madeImages []string
 	for _, tag := range allTags {
 		destination := strings.Join([]string{source_base, tag}, ":")
 
@@ -72,7 +74,7 @@ func PrepareDocker(source string, semver string, suffix string) ([]string, error
 
 // PushImage pushes docker images to a docker registry
 func PushImage(source string, user string, password string) error {
-	dockerCli, err := dc.NewEnvClient()
+	dockerCli, err := dc.NewClientWithOpts()
 	if err != nil {
 		return err
 	}
@@ -89,6 +91,9 @@ func PushImage(source string, user string, password string) error {
 	authStr := base64.URLEncoding.EncodeToString(encodedJSON)
 
 	closer, err := dockerCli.ImagePush(context.Background(), source, types.ImagePushOptions{RegistryAuth: authStr})
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	defer closer.Close()
 
@@ -101,7 +106,7 @@ func PushImage(source string, user string, password string) error {
 }
 
 func tagImage(source string, destination string) (string, error) {
-	dockerCli, err := dc.NewEnvClient()
+	dockerCli, err := dc.NewClientWithOpts()
 	if err != nil {
 		return "Could not establish docker client", err
 	}
