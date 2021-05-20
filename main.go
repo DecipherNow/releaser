@@ -90,7 +90,7 @@ func main() {
 				if err != nil {
 					fmt.Println("Create images", images)
 					fmt.Println("Error found:", err)
-					os.Exit(1)
+					return cli.NewExitError(err, 1)
 				}
 
 				for _, imageName := range images {
@@ -129,7 +129,7 @@ func main() {
 				}
 
 				msg, err := github.PrepareGithubRelease(
-					*client,
+					client,
 					clictx.String("semver"),
 					clictx.String("organization"),
 					clictx.String("asset"),
@@ -138,6 +138,7 @@ func main() {
 				if err != nil {
 					fmt.Println("Error in github stuff", err)
 					fmt.Println(msg)
+					return cli.NewExitError(err, 1)
 				}
 
 				return nil
@@ -168,10 +169,15 @@ func main() {
 				}
 
 				repository, err := utils.ParseRepoName()
+				if err != nil {
+					fmt.Println("failed to parse repo name:", err.Error())
+					return cli.NewExitError(err, 1)
+				}
+
 				fmt.Println("Uploading asset to:", repository)
 				fmt.Println("Uploading asset to release:", clictx.Int64("releaseID"))
 				err = github.UploadReleaseAsset(
-					*client,
+					client,
 					clictx.Int64("releaseID"),
 					clictx.String("organization"),
 					repository,
@@ -180,6 +186,7 @@ func main() {
 
 				if err != nil {
 					fmt.Println("Error uploading release asset:", err)
+					return cli.NewExitError(err, 1)
 				}
 
 				return nil

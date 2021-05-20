@@ -36,13 +36,11 @@ func IsDevCommit(version string) bool {
 }
 
 // Parsesemver is a really quick parser for symantic versioning.
-func Parsesemver(version string) (major, minor, patch string, err error) {
-	if strings.HasPrefix(version, "v") {
-		version = version[1:len(version)]
-	}
+func Parsesemver(version string) (major, minor, patch string) {
+	version = strings.TrimPrefix(version, "v")
 	splitsemver := strings.Split(version, ".")
 
-	return splitsemver[0], splitsemver[1], splitsemver[2], nil
+	return splitsemver[0], splitsemver[1], splitsemver[2]
 }
 
 // ParseGitHash gets the commit hash from the git repo in the current directory.

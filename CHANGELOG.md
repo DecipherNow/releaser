@@ -1,3 +1,14 @@
+## 0.3.3 (May 20, 2021)
+
+## Added
+
+- If a tag includes `rc.-`, release only the fully qualified version name
+
+## Changed
+
+- Upgrade to Go 1.16
+- Use Go modules
+
 ## 0.3.2 (Jan 8th, 2018)
 ### Added
 - Push to normalized Docker registry names
